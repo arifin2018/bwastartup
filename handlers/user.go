@@ -72,3 +72,39 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *userHandler) LoginUser(c *gin.Context) {
+	var input = new(user.LoginUser)
+	if err := c.ShouldBindBodyWithJSON(input); err != nil {
+		var errorsData []string
+		var ve validator.ValidationErrors
+		if errors.As(err, &ve) {
+			for _, v := range err.(validator.ValidationErrors) {
+				errorsData = append(errorsData, v.Error())
+			}
+		}
+
+		errorMessage := gin.H{
+			"errors": errorsData,
+		}
+
+		response := helpers.ApiResponse("Account failed", http.StatusOK, "success", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	user, err := h.userService.LoginUser(*input)
+	if err != nil {
+		errorMessage := gin.H{
+			"errors": err.Error(),
+		}
+
+		response := helpers.ApiResponse("Login failed", http.StatusOK, "error", errorMessage)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	response := helpers.ApiResponse("Account has been registered", http.StatusOK, "success", user)
+
+	c.JSON(http.StatusOK, response)
+
+}

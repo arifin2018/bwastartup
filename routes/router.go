@@ -16,5 +16,6 @@ func Router() {
 	var gin = gin.Default()
 	api := gin.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
+	api.GET("/users", userHandler.LoginUser)
 	gin.Run()
 }

@@ -6,6 +6,7 @@ import (
 
 type Repository interface {
 	Save(user User) (User, error)
+	FindByEmail(email string) (User, error)
 }
 
 type repositoryImpl struct {
@@ -22,4 +23,12 @@ func (repository *repositoryImpl) Save(user User) (User, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+func (repository *repositoryImpl) FindByEmail(email string) (User, error) {
+	user := new(User)
+	if err := repository.db.Where("email = ?", email).Find(user).Error; err != nil {
+		return *user, nil
+	}
+	return *user, nil
 }
