@@ -17,5 +17,7 @@ func Router() {
 	api := gin.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.GET("/users", userHandler.LoginUser)
+	api.GET("/email_checkers", userHandler.LoginUser)
+	api.POST("/avatars", userHandler.UploadAvatar)
 	gin.Run()
 }

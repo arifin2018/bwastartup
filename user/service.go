@@ -10,6 +10,8 @@ import (
 type Service interface {
 	RegisterUser(input RegisterUser) (User, error)
 	LoginUser(input LoginUser) (User, error)
+	IsEmailAvailable(input CheckEmailInput) (bool, error)
+	SaveAvatar(Id int, fileLocation string) (User, error)
 }
 
 type serviceImpl struct {
@@ -58,4 +60,32 @@ func (s *serviceImpl) LoginUser(input LoginUser) (User, error) {
 		return User{}, err
 	}
 	return user, nil
+}
+
+func (s *serviceImpl) IsEmailAvailable(input CheckEmailInput) (bool, error) {
+	email := input.Email
+
+	user, err := s.repository.FindByEmail(email)
+	if err != nil {
+		return false, err
+	}
+
+	if user.Id == 0 {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (s *serviceImpl) SaveAvatar(Id int, fileLocation string) (User, error) {
+	user, err := s.repository.FindById(Id)
+	if err != nil {
+		return user, nil
+	}
+	user.AvatarFileName = fileLocation
+	updatedUser, err := s.repository.Update(user)
+	if err != nil {
+		return user, nil
+	}
+	return updatedUser, err
 }

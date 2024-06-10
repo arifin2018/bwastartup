@@ -7,6 +7,8 @@ import (
 type Repository interface {
 	Save(user User) (User, error)
 	FindByEmail(email string) (User, error)
+	FindById(Id int) (User, error)
+	Update(user User) (User, error)
 }
 
 type repositoryImpl struct {
@@ -31,4 +33,19 @@ func (repository *repositoryImpl) FindByEmail(email string) (User, error) {
 		return *user, nil
 	}
 	return *user, nil
+}
+
+func (repository *repositoryImpl) FindById(Id int) (User, error) {
+	user := new(User)
+	if err := repository.db.Where("Id = ?", Id).Find(user).Error; err != nil {
+		return *user, nil
+	}
+	return *user, nil
+}
+
+func (repository *repositoryImpl) Update(user User) (User, error) {
+	if err := repository.db.Save(&user).Error; err != nil {
+		return user, nil
+	}
+	return user, nil
 }
