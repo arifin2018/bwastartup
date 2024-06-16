@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bwastartup/auth"
 	"bwastartup/config"
 	"bwastartup/handlers"
 	"bwastartup/user"
@@ -11,12 +12,13 @@ import (
 func Router() {
 	userRepository := user.NewRepository(config.DB)
 	userService := user.NewService(userRepository)
-	userHandler := handlers.NewUserHandler(userService)
+	authService := auth.NewJwtService()
+	userHandler := handlers.NewUserHandler(userService, authService)
 
 	var gin = gin.Default()
 	api := gin.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
-	api.GET("/users", userHandler.LoginUser)
+	api.POST("/sessions", userHandler.LoginUser)
 	api.GET("/email_checkers", userHandler.LoginUser)
 	api.POST("/avatars", userHandler.UploadAvatar)
 	gin.Run()
