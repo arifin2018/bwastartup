@@ -5,6 +5,7 @@ import (
 	"bwastartup/config"
 	"bwastartup/handlers"
 	"bwastartup/user"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,17 @@ func Router() {
 	userService := user.NewService(userRepository)
 	authService := auth.NewJwtService()
 	userHandler := handlers.NewUserHandler(userService, authService)
+
+	tokenValidate, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyfQ.z0Sl9bmutbXwvQpTxua76AA5G8oGGqqqO0GKF4eOAJ4")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	if tokenValidate.Valid {
+		fmt.Println("valid")
+	} else {
+		fmt.Println("not valid")
+	}
 
 	var gin = gin.Default()
 	api := gin.Group("/api/v1")
