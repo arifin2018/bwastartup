@@ -3,10 +3,10 @@ package routes
 import (
 	"bwastartup/auth"
 	"bwastartup/auth/middlewares"
+	"bwastartup/campaign"
 	"bwastartup/config"
 	"bwastartup/handlers"
 	"bwastartup/user"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,16 +17,9 @@ func Router() {
 	authService := auth.NewJwtService()
 	userHandler := handlers.NewUserHandler(userService, authService)
 
-	tokenValidate, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoyfQ.z0Sl9bmutbXwvQpTxua76AA5G8oGGqqqO0GKF4eOAJ4")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	if tokenValidate.Valid {
-		fmt.Println("valid")
-	} else {
-		fmt.Println("not valid")
-	}
+	campaignRepository := campaign.NewRepository(config.DB)
+	campaignService := campaign.NewService(campaignRepository)
+	campaignHandler := handlers.NewCampaignHandler(campaignService)
 
 	var gin = gin.Default()
 	api := gin.Group("/api/v1")
@@ -34,5 +27,8 @@ func Router() {
 	api.POST("/sessions", userHandler.LoginUser)
 	api.POST("/email_checkers", userHandler.LoginUser)
 	api.POST("/avatars", middlewares.AuthMiddleware(authService, userService), userHandler.UploadAvatar)
+
+	api.GET("/campaign", campaignHandler.GetCampaigns)
+
 	gin.Run()
 }
