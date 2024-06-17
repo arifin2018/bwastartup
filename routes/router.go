@@ -2,6 +2,7 @@ package routes
 
 import (
 	"bwastartup/auth"
+	"bwastartup/auth/middlewares"
 	"bwastartup/config"
 	"bwastartup/handlers"
 	"bwastartup/user"
@@ -31,7 +32,7 @@ func Router() {
 	api := gin.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.LoginUser)
-	api.GET("/email_checkers", userHandler.LoginUser)
-	api.POST("/avatars", userHandler.UploadAvatar)
+	api.POST("/email_checkers", userHandler.LoginUser)
+	api.POST("/avatars", middlewares.AuthMiddleware(authService, userService), userHandler.UploadAvatar)
 	gin.Run()
 }
