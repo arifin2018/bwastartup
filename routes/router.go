@@ -22,12 +22,15 @@ func Router() {
 	campaignHandler := handlers.NewCampaignHandler(campaignService)
 
 	var gin = gin.Default()
+	gin.Static("/images", "./images")
+
 	api := gin.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.LoginUser)
 	api.POST("/email_checkers", userHandler.LoginUser)
 	api.POST("/avatars", middlewares.AuthMiddleware(authService, userService), userHandler.UploadAvatar)
 
+	api.GET("/campaign/:id", campaignHandler.GetCampaign)
 	api.GET("/campaign", campaignHandler.GetCampaigns)
 
 	gin.Run()
